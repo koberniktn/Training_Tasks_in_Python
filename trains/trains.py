@@ -1,3 +1,6 @@
+import os
+error_message = 'ERROR in file {}. Expected: "{}", got: "{}"'
+
 def walk(trains, event):
     passenge_found = False
     i = 0
@@ -7,6 +10,7 @@ def walk(trains, event):
     if (name == None) or (distance == None):
         print("Недостаточно данных")
         return -1
+
     for train in trains:
         cars = train["cars"]
         while i < len(cars) and passenge_found == False:
@@ -43,7 +47,7 @@ def switch(trains, event):
 
     for train in trains:
         if train["name"] == train_to:
-            train["cars"].exstend(buff[::-1])
+            train["cars"].extend(buff[::-1])
             return(trains)
 
     return -1
@@ -55,21 +59,34 @@ def process(data):
         if event.get("type") == "walk":
             trains = walk(trains, event)
             if trains == -1:
-                print(-1)
                 return -1
         if event.get("type") == "switch":
             trains = switch(trains, event)
             if trains == -1:
-                print(-1)
                 return -1
 
     for train in trains:
         for car in train["cars"]:
             if car["name"] == car_res:
                 result = len(car["people"])
-                print(result)
-                if result == data["result"]["amount"]:
-                    print("It is true")
-                else:
-                    print("Not correct!!!")
-                return result
+
+    return result
+
+def run_tests():
+    os.chdir('C:/Users/tnkob/AppData/Roaming/JetBrains/PyCharmCE2021.3/scratches/tests')
+    files = os.listdir()
+    for file in files:
+
+        f = open(file, 'r')
+        data = eval(f.read())
+        f.close()
+
+        got = process(data)
+        expected = data["result"]["amount"]
+        if got != expected:
+            print(error_message.format(file, expected, got))
+            return -1
+    print("All tests passed!")
+
+if __name__ == '__main__':
+    run_tests()
